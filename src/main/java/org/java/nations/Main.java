@@ -18,7 +18,7 @@ public class Main {
 		
 		try (Connection con = DriverManager.getConnection(url, user, password)) {
 			
-			String sql = "SELECT * FROM countries c ORDER BY c.name";
+			String sql = "SELECT DISTINCT c.name, c.country_id , r.name, c2.name FROM countries c JOIN regions r ON c.region_id = r.region_id JOIN continents c2 ON r.continent_id = c2.continent_id ORDER BY c.name";
 			
 			try (PreparedStatement ps = con.prepareStatement(sql)) {
 				
@@ -26,13 +26,14 @@ public class Main {
 					
 					while(rs.next()) {
 						
-						final int id = rs.getInt(1);
-						final String name = rs.getString(2);
-						final int area = rs.getInt(3);
+						final String nationName = rs.getString(1);
+						final int nationId = rs.getInt(2);
+						final String regionName = rs.getString(3);
+						final String continentName = rs.getString(4);
 						
 							
-						System.out.println(id + " - " + name + " - " 
-								+ area);
+						System.out.println(nationName + " - " + nationId + " - " 
+								+ regionName + " - " + continentName);
 					}
 				}				
 			} catch (SQLException ex) {
