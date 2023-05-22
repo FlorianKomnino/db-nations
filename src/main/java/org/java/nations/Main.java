@@ -52,6 +52,56 @@ public class Main {
 			} catch (SQLException ex) {
 				System.err.println("Query not well formed");
 			}
+			
+			System.out.print("Inserisci l'id della nazione di cui vuoi conoscere i dettagli: ");
+			String userAdvancedResearch = sc.nextLine();
+			int userInputId = Integer.valueOf(userAdvancedResearch);
+			
+			String sqlAdvanced = "SELECT c.name, l.`language`, cs.`year` AS lastYear, cs.population, cs.gdp "
+					+ "FROM countries c "
+					+ "JOIN country_languages cl "
+					+ "ON c.country_id = cl.country_id "
+					+ "JOIN languages l "
+					+ "ON cl.language_id = l.language_id JOIN country_stats cs "
+					+ "ON c.country_id = cs.country_id "
+					+ "WHERE c.country_id = " + userInputId
+					+ " HAVING lastYear = ("
+					+ "SELECT max(cs2.`year`) "
+					+ "FROM country_stats cs2 "
+					+ "JOIN countries c2 "
+					+ "ON cs2.country_id = c2.country_id "
+					+ "WHERE c2.country_id = " + userInputId
+					+ " ORDER BY cs2.`year` "
+					+ "DESC "
+					+ "LIMIT 1)";
+
+			
+			try (PreparedStatement ps = con.prepareStatement(sqlAdvanced)) {
+
+				try (ResultSet rs = ps.executeQuery()) {
+					
+					System.out.println("Le lingue parlate nello stato scelto sono:");
+					while(rs.next()) {
+						
+						final String nationLanguage = rs.getString(2);
+						
+						System.out.println(nationLanguage);
+						
+					}
+					if (rs.next() == false) {
+							final int lastYear = rs.getInt(3);
+							final int nationPopulation = rs.getInt(4);
+							final int gdp = rs.getInt(5);
+							
+							System.out.println("Ultimo anno di statistiche: " + lastYear);
+							System.out.println("Popolazione della nazione: " + nationPopulation);
+							System.out.println("GDP della nazione: " + gdp);
+						}
+				}				
+			} catch (SQLException ex) {
+				System.err.println("Query not well formed");
+			}
+			
 		} catch (SQLException ex) {
 			System.err.println("Error during connection to db");
 		}
