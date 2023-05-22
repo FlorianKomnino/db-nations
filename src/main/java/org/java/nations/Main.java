@@ -1,5 +1,6 @@
 package org.java.nations;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -79,24 +80,26 @@ public class Main {
 			try (PreparedStatement ps = con.prepareStatement(sqlAdvanced)) {
 
 				try (ResultSet rs = ps.executeQuery()) {
+					int i = 0;
 					
-					System.out.println("Le lingue parlate nello stato scelto sono:");
 					while(rs.next()) {
-						
+						if (i == 0) {
+							final int lastYear = rs.getInt(3);
+							final int nationPopulation = rs.getInt(4);
+							final BigDecimal gdp = rs.getBigDecimal(5);
+							
+							System.out.println("Ultimo anno di statistiche: " + lastYear);
+							System.out.println("Popolazione della nazione: " + nationPopulation);
+							System.out.println("GDP della nazione: " + gdp);
+							System.out.println("Le lingue parlate nello stato scelto sono:");
+							i++;
+						}
 						final String nationLanguage = rs.getString(2);
 						
 						System.out.println(nationLanguage);
 						
 					}
-					if (rs.next() == false) {
-							final int lastYear = rs.getInt(3);
-							final int nationPopulation = rs.getInt(4);
-							final int gdp = rs.getInt(5);
-							
-							System.out.println("Ultimo anno di statistiche: " + lastYear);
-							System.out.println("Popolazione della nazione: " + nationPopulation);
-							System.out.println("GDP della nazione: " + gdp);
-						}
+
 				}				
 			} catch (SQLException ex) {
 				System.err.println("Query not well formed");
