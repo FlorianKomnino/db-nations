@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.Scanner;
 import java.util.TimeZone;
 
 public class Main {
@@ -16,12 +17,24 @@ public class Main {
 		String user = "root";
 		String password = "code";
 		
-		try (Connection con = DriverManager.getConnection(url, user, password)) {
+		try (Scanner sc = new Scanner(System.in);
+				Connection con = DriverManager.getConnection(url, user, password)) {
 			
-			String sql = "SELECT DISTINCT c.name, c.country_id , r.name, c2.name FROM countries c JOIN regions r ON c.region_id = r.region_id JOIN continents c2 ON r.continent_id = c2.continent_id ORDER BY c.name";
+			
+			System.out.print("Ricerca nazioni per nome o parte del nome: ");
+			String userResearch = sc.nextLine();
+			
+			String sql = "SELECT c.name, c.country_id , r.name, c2.name FROM countries c "
+					+ "JOIN regions r "
+					+ "ON c.region_id = r.region_id "
+					+ "JOIN continents c2 "
+					+ "ON r.continent_id = c2.continent_id "
+					+ "WHERE c.name LIKE \"%" + userResearch + "%\" "
+					+ "ORDER BY c.name";
+
 			
 			try (PreparedStatement ps = con.prepareStatement(sql)) {
-				
+
 				try (ResultSet rs = ps.executeQuery()) {
 					
 					while(rs.next()) {
